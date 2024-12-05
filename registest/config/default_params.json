@@ -1,0 +1,8 @@
+{
+    "transform": {"type": "rotate", "angle": 45},
+    "extract": {"region": [10, 20, 10, 50, 10, 50]},
+    "register": {"method": "affine"},
+    "compare": {"metric": "mse"},
+    "visualize": {"slice": 30},
+    "report": {"output": "report.pdf"}
+}

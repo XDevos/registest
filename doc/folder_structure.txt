@@ -1,0 +1,42 @@
+image_processing_framework/
+├── main.py                   # Entry point
+├── config/
+│   └── default_params.json   # Default parameters
+├── core/
+│   ├── input_handler.py      # Handles input and validation
+│   ├── command_parser.py     # Parses and dispatches commands
+│   ├── pipeline.py           # Orchestrates the pipeline
+├── modules/
+│   ├── transform.py          # Transform operations
+│   ├── extract.py            # Extraction operations
+│   ├── register.py           # Registration methods
+│   ├── shift.py              # Shifting operations
+│   ├── compare.py            # Image comparison
+│   ├── visualize.py          # Visualization tools
+│   ├── report.py             # Report generation
+├── utils/
+│   ├── io_utils.py           # Helper functions for I/O
+│   ├── metrics.py            # Quantitative metrics
+│   ├── visualization.py      # Visualization utilities
+├── tests/
+│   └── test_modules.py       # Unit tests for modules
+└── README.md                 # Documentation
+
+
+
+Core Components
+    InputHandler: Reads and validates the input 3D TIFF images.
+    CommandParser: Parses and dispatches commands to the respective modules.
+    Pipeline: Orchestrates the execution of commands in sequence.
+
+Processing Modules
+    Transform: Applies transformations (rotate, scale, affine, etc.).
+    Extract: Extracts sub-regions or features from the image.
+    Register: Performs image registration (rigid, affine, non-linear).
+    Shift: Applies shifts to the image for alignment or testing.
+    Compare: Compares images quantitatively (e.g., MSE, SSIM, Dice coefficient).
+    Visualize: Handles visualization of slices, volumes, or overlays.
+    Report: Generates summaries or reports of results.
+
+Parameter Handling
+    ConfigManager: Manages parameters like transformation details or registration methods.
