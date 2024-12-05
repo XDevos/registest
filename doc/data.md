@@ -21,3 +21,19 @@ input:
 	parameters:
 		how to transform
 		registration method
+
+def extract(img1, img2):
+	"""extract a mask of common valid value
+	return NaN(img1) OR NaN(img2)"""
+
+def transform(img, zxy):
+	"""shift img with specific output filename
+	return shifted_img"""
+
+def register(ref, target):
+	"""apply a specific method to find the shifts between ref and target.
+	return zxy_shift"""
+
+def compare(ref, target):
+	"""return MSE ou SSIM"""
+
