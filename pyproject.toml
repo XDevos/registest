@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "registest"
+version = "0.1.0"
+description = "Registration testing Tool"
+readme = "README.md"
+authors = [{ name = "Xavier DEVOS", email = "xavier.devos@cbs.cnrs.fr" }]
+license = { file = "LICENSE" }
+keywords = ["tifffile"]
+dependencies = ["tifffile >= 2021.10.10"]
+requires-python = ">=3.9"
+
+[project.urls]
+Homepage = "https://github.com/XDevos/registest"
+
+[project.scripts]
+registest = "run_registest:main"
