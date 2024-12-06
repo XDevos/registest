@@ -31,6 +31,7 @@ def main(command_line_arguments=None):
     # Initialize components
     command_list = [
         Transform,
+        # Compare,
         # Extract,
         # Register,
         # Shift,

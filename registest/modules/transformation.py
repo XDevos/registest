@@ -45,8 +45,9 @@ class Transform:
         return shift_3d_array_subpixel(img, shift_values, filling_val=np.nan)
 
     def save(self, img_shifted):
-        if not os.path.exists(self.out_folder):
-            os.makedirs(self.out_folder)
+        out_transform = os.path.join(self.out_folder, "transform")
+        if not os.path.exists(out_transform):
+            os.makedirs(out_transform)
         filename = self.out_filenames.pop(0)
-        filepath = os.path.join(self.out_folder, filename)
+        filepath = os.path.join(out_transform, filename)
         save_tiff(img_shifted, filepath)
