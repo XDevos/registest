@@ -36,4 +36,3 @@ def register(ref, target):
 
 def compare(ref, target):
 	"""return MSE ou SSIM"""
-
