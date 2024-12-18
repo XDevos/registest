@@ -15,11 +15,10 @@ def parse_run_args():
     """
     parser = ArgumentParser()
     parser.add_argument(
-        "-I",
-        "--input",
+        "-R",
+        "--reference",
         type=str,
-        default=os.getcwd(),
-        help="Folder path with input data.\nDEFAULT: Current directory",
+        help="Reference 3D image filepath.",
     )
     parser.add_argument(
         "-O",
@@ -33,7 +32,7 @@ def parse_run_args():
         "--parameters",
         type=str,
         default=None,
-        help="Path of the parameters.json file.\nDEFAULT: FLtower expect this file inside your current directory",
+        help="Path of the parameters.json file.\nDEFAULT: We expect this file inside your current directory",
     )
 
     return parser.parse_args()
