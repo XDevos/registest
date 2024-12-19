@@ -4,20 +4,25 @@
 from datetime import datetime
 
 from modules.transformation import Transform
-from utils.io_utils import load_parameters, load_tiff
+from utils.io_utils import load_parameters
 
 from registest._version import __version__
+from registest.core.data_manager import DataManager
 
 # from core.command_parser import CommandParser
 # from core.pipeline import Pipeline
 from registest.core.run_args import parse_run_args
 
 
-def main(command_line_arguments=None):
+def main():
     run_args = parse_run_args()
+    datam = DataManager(run_args.reference, run_args.output)
+    # param = Parameters(run_args.parameters)
+
+    # pipe = Pipeline(datam, param)
+    # pipe.execute()
+
     # Load the input image and commands
-    ref_path = run_args.input
-    out_folder = run_args.output
     params_path = run_args.parameters
     # commands = [
     #     {"command": "transform", "params": {"type": "rotate", "angle": 45}},
@@ -45,10 +50,10 @@ def main(command_line_arguments=None):
     # # Execute the pipeline
     # pipeline.run()
     all_params = load_parameters(params_path)
-    ref = load_tiff(ref_path)
+    ref = datam.ref.data
     for cmd in command_list:
         params = all_params[cmd.__name__]
-        routine = cmd(params, out_folder)
+        routine = cmd(params, datam.out_folder.path)
         input_list = routine.load_inputs()
         for input in input_list:
             output = routine.execute(ref, input)
