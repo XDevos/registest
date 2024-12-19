@@ -10,7 +10,7 @@ readme = "README.md"
 authors = [{ name = "Xavier DEVOS", email = "xavier.devos@cbs.cnrs.fr" }]
 license = { file = "LICENSE" }
 keywords = ["tifffile", "scipy"]
-dependencies = ["tifffile", "scipy", "tqdm"]
+dependencies = ["tifffile", "scipy", "tqdm", "scikit-image"]
 requires-python = ">=3.9"
 
 [project.urls]
