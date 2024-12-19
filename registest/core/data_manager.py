@@ -108,6 +108,41 @@ class DataManager:
 
     def save_tif(self, data, folder, name):
         folder_path = self.out_folder.find_path(folder)
-        name_with_ext = name + ".tif"
-        filepath = os.path.join(folder_path, name_with_ext)
+        if name[-4:] != ".tif":
+            name = name + ".tif"
+        filepath = os.path.join(folder_path, name)
         save_tiff(data, filepath)
+
+    def get_prepa_img_paths(self):
+        folder_to_explore = self.out_folder.prepa
+        paths = get_tif_filepaths(folder_to_explore)
+        return paths
+
+
+def get_tif_filepaths(folder_path):
+    """
+    Retrieve all .tif and .tiff file paths from a given folder.
+
+    Parameters
+    ----------
+    folder_path : str
+        Path to the folder to search for TIFF files.
+
+    Returns
+    -------
+    list of str
+        A list of file paths to .tif or .tiff files in the folder.
+    """
+    if not os.path.exists(folder_path):
+        raise FileNotFoundError(f"The folder '{folder_path}' does not exist.")
+
+    if not os.path.isdir(folder_path):
+        raise ValueError(f"The path '{folder_path}' is not a directory.")
+
+    tif_paths = [
+        os.path.join(folder_path, file)
+        for file in os.listdir(folder_path)
+        if file.endswith((".tif", ".tiff"))
+    ]
+
+    return tif_paths

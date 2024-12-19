@@ -1,7 +1,10 @@
+import os
 from typing import Any, List
 
 import numpy as np
 from scipy.ndimage import shift
+
+from registest.utils.io_utils import save_json
 
 
 def shift_3d_array_subpixel(array_3d, shift_values, filling_val=0.0):
@@ -49,3 +52,8 @@ class Transform:
             raise NotImplementedError(
                 f"The method '{self.method}' is not implemented. Please use a supported method such as 'scipy'."
             )
+
+    def save_shifts_used(self, prepa_path):
+        out = {f"target_{i}.tif": self.shifts[i] for i in range(len(self.shifts))}
+        path = os.path.join(prepa_path, "image_names_with_shifts.json")
+        save_json(out, path)

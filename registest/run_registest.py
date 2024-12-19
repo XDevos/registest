@@ -10,7 +10,7 @@ from registest.core.pipeline import Pipeline
 from registest.core.run_args import parse_run_args
 
 
-def main():
+def _main():
     run_args = parse_run_args()
     datam = DataManager(run_args.reference, run_args.output)
     params = Parameters(run_args.parameters)
@@ -18,9 +18,13 @@ def main():
     pipe.run()
 
 
-if __name__ == "__main__":
+def main():
     begin_time = datetime.now()
-    print(f"[VERSION] registest {__version__}")
-    main()
+    print(f"[VERSION] RegisTest {__version__}")
+    _main()
     print("\n==================== Normal termination ====================\n")
     print(f"Elapsed time: {datetime.now() - begin_time}")
+
+
+if __name__ == "__main__":
+    main()
