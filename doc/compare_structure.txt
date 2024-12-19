@@ -1,0 +1,13 @@
+INPUT/
+├── reference.tif
+registered/
+├── method_global/
+│   ├── target_0.tif
+│   ├── target_1.tif
+│   ├── ...
+│   └── target_n.tif
+├── method_local/
+│   ├── target_0.tif
+│   ├── target_1.tif
+│   ├── ...
+│   └── target_n.tif
