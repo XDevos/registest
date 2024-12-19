@@ -5,7 +5,8 @@ import os
 from tqdm import tqdm, trange
 
 from registest.config.parameters import Parameters
-from registest.core.data_manager import DataManager
+from registest.core.data_manager import DataManager, get_tif_filepaths
+from registest.modules.comparison import Compare
 from registest.modules.registration import phase_cross_correlation_wrapper
 from registest.modules.transformation import Transform, shift_3d_array_subpixel
 from registest.utils.io_utils import load_tiff, save_json
@@ -40,7 +41,7 @@ class Pipeline:
 
     def register(self):
         shifts_found = {}
-        target_paths = self.datam.get_prepa_img_paths()
+        target_paths = get_tif_filepaths(self.datam.out_folder.prepa)
         for targ_path in tqdm(target_paths):
             target = load_tiff(targ_path)
             shift_3d = list(phase_cross_correlation_wrapper(self.ref, target))
@@ -55,4 +56,11 @@ class Pipeline:
         save_json(shifts_found, path)
 
     def compare(self):
-        pass
+        shifted_target_paths = get_tif_filepaths(self.datam.out_folder.regis)
+        for targ_path in tqdm(shifted_target_paths):
+            basename = os.path.basename(targ_path)
+            print(f"Target: {basename}")
+            target = load_tiff(targ_path)
+            for metric in ["mse", "ssim"]:
+                result = Compare.execute(self.ref, target, metric)
+                print(f"> {metric}: {result}")
