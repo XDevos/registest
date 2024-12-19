@@ -9,8 +9,8 @@ description = "Registration testing Tool"
 readme = "README.md"
 authors = [{ name = "Xavier DEVOS", email = "xavier.devos@cbs.cnrs.fr" }]
 license = { file = "LICENSE" }
-keywords = ["tifffile"]
-dependencies = ["tifffile"]
+keywords = ["tifffile", "scipy"]
+dependencies = ["tifffile", "scipy"]
 requires-python = ">=3.9"
 
 [project.urls]
