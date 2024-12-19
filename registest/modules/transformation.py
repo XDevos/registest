@@ -1,9 +1,7 @@
-import os
+from typing import Any, List
 
 import numpy as np
 from scipy.ndimage import shift
-
-from registest.utils.io_utils import save_tiff
 
 
 def shift_3d_array_subpixel(array_3d, shift_values, filling_val=0.0):
@@ -29,25 +27,25 @@ def shift_3d_array_subpixel(array_3d, shift_values, filling_val=0.0):
 
 
 class Transform:
-    def __init__(self, params, out_folder):
-        self.out_folder = out_folder
-        self.params = params
-        self.out_filenames = []
+    def __init__(self, prepare_params: dict):
+        self.method: str = prepare_params["method"]
+        self.shifts: List[List[float]] = prepare_params["shifts"]
+        self.filling_value: Any = self.cast_filling_value(
+            prepare_params["filling_value"]
+        )
 
-    def load_inputs(self):
-        inputs = []
-        for p_dict in self.params:
-            inputs.append(p_dict["shift_value"])
-            self.out_filenames.append(p_dict["filename"])
-        return inputs
+    def cast_filling_value(self, value):
+        if value == "nan" or value == "NaN":
+            return np.nan
+        else:
+            return float(value)
 
-    def execute(self, img, shift_values):
-        return shift_3d_array_subpixel(img, shift_values, filling_val=np.nan)
-
-    def save(self, img_shifted):
-        out_transform = os.path.join(self.out_folder, "transform")
-        if not os.path.exists(out_transform):
-            os.makedirs(out_transform)
-        filename = self.out_filenames.pop(0)
-        filepath = os.path.join(out_transform, filename)
-        save_tiff(img_shifted, filepath)
+    def execute(self, img, shift_index):
+        if self.method == "scipy":
+            return shift_3d_array_subpixel(
+                img, self.shifts[shift_index], filling_val=self.filling_value
+            )
+        else:
+            raise NotImplementedError(
+                f"The method '{self.method}' is not implemented. Please use a supported method such as 'scipy'."
+            )

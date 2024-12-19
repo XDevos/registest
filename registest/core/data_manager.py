@@ -2,7 +2,7 @@
 
 import os
 
-from registest.utils.io_utils import load_tiff
+from registest.utils.io_utils import load_tiff, save_tiff
 
 
 class ReferenceImg:
@@ -70,9 +70,9 @@ class OutFolder:
             Path to the main output folder.
         """
         self.path = path
-        self.prepa = os.path.join(self.path, "PREPARATION")
-        self.regis = os.path.join(self.path, "REGISTRATION")
-        self.comp = os.path.join(self.path, "COMPARISON")
+        self.prepa = os.path.join(self.path, "Preparation")
+        self.regis = os.path.join(self.path, "Registration")
+        self.comp = os.path.join(self.path, "Comparison")
         self.create_folders()
 
     def create_folders(self):
@@ -90,8 +90,24 @@ class OutFolder:
             # for the case of permission issues
             raise RuntimeError(f"Error creating folders: {e}")
 
+    def find_path(self, name: str):
+        if name == os.path.basename(self.prepa):
+            return self.prepa
+        elif name == os.path.basename(self.regis):
+            return self.regis
+        elif name == os.path.basename(self.comp):
+            return self.comp
+        else:
+            raise ValueError(f"The folder name '{name}' doesn't exist.")
+
 
 class DataManager:
     def __init__(self, reference_path: str, output_path: str):
         self.ref = ReferenceImg(reference_path)
         self.out_folder = OutFolder(output_path)
+
+    def save_tif(self, data, folder, name):
+        folder_path = self.out_folder.find_path(folder)
+        name_with_ext = name + ".tif"
+        filepath = os.path.join(folder_path, name_with_ext)
+        save_tiff(data, filepath)
