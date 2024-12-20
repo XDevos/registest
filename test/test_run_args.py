@@ -14,7 +14,7 @@ def test_parse_run_args_no_args(monkeypatch):
     # Assert default values
     assert args.reference is None
     assert args.output == os.getcwd()
-    assert args.parameters is None
+    assert args.parameters == os.getcwd() + os.sep + "parameters.json"
 
 
 def test_parse_run_args_with_reference(monkeypatch):
@@ -24,7 +24,7 @@ def test_parse_run_args_with_reference(monkeypatch):
 
     assert args.reference == "/path/to/reference"
     assert args.output == os.getcwd()
-    assert args.parameters is None
+    assert args.parameters == os.getcwd() + os.sep + "parameters.json"
 
 
 def test_parse_run_args_with_all_arguments(monkeypatch):
@@ -58,4 +58,4 @@ def test_parse_run_args_with_default_parameters(monkeypatch):
 
     assert args.reference == "/path/to/reference"
     assert args.output == "/path/to/output"
-    assert args.parameters is None
+    assert args.parameters == os.getcwd() + os.sep + "parameters.json"

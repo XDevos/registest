@@ -40,7 +40,9 @@ def test_pipeline_initialization(mock_data_manager, mock_parameters):
     """
     Test Pipeline initialization.
     """
-    pipeline = Pipeline(datam=mock_data_manager, params=mock_parameters)
+    pipeline = Pipeline(
+        datam=mock_data_manager, params=mock_parameters, raw_cmd_list="prepare"
+    )
     assert pipeline.datam == mock_data_manager
     assert pipeline.params == mock_parameters
     assert pipeline.ref == "mock_reference_image"
@@ -61,7 +63,9 @@ def test_pipeline_prepare(
     mock_transform_instance = mock_transform_class.return_value
     mock_transform_instance.execute.return_value = "mock_transformed_image"
 
-    pipeline = Pipeline(datam=mock_data_manager, params=mock_parameters)
+    pipeline = Pipeline(
+        datam=mock_data_manager, params=mock_parameters, raw_cmd_list="prepare"
+    )
     pipeline.prepare()
 
     # Verify that Transform was initialized with the correct parameters
