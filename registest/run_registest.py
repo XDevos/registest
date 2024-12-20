@@ -14,7 +14,7 @@ def _main():
     run_args = parse_run_args()
     datam = DataManager(run_args.reference, run_args.output)
     params = Parameters(run_args.parameters)
-    pipe = Pipeline(datam, params)
+    pipe = Pipeline(datam, params, run_args.command)
     pipe.run()
 
 

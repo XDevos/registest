@@ -28,10 +28,17 @@ def parse_run_args():
         help="Folder path for output data.\nDEFAULT: Current directory",
     )
     parser.add_argument(
+        "-C",
+        "--command",
+        type=str,
+        default="prepare,register,compare",
+        help="Comma-separated command list.\nDEFAULT: prepare,register,compare",
+    )
+    parser.add_argument(
         "-P",
         "--parameters",
         type=str,
-        default=None,
+        default=os.getcwd() + os.sep + "parameters.json",
         help="Path of the parameters.json file.\nDEFAULT: We expect this file inside your current directory",
     )
 

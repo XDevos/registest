@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from typing import List
 
 from registest.utils.io_utils import load_tiff, save_tiff
 
@@ -111,12 +112,18 @@ class DataManager:
         if name[-4:] != ".tif":
             name = name + ".tif"
         filepath = os.path.join(folder_path, name)
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
         save_tiff(data, filepath)
 
     def get_prepa_img_paths(self):
         folder_to_explore = self.out_folder.prepa
         paths = get_tif_filepaths(folder_to_explore)
         return paths
+
+    def make_method_folders(self, root: str, fold_names: List[str]):
+        for name in fold_names:
+            dir_path = os.path.join(root, name)
+            os.makedirs(dir_path, exist_ok=True)
 
 
 def get_tif_filepaths(folder_path):

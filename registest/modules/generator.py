@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import random
+
 import numpy as np
 import tifffile
 
@@ -75,17 +77,51 @@ def add_psf(image, psf, position=None):
 
 
 if __name__ == "__main__":
-    psf1 = generate_psf(
-        shape=(60, 128, 128), voxel_size=(0.25, 0.1, 0.1), attenuation_factor=20
-    )
-    psf2 = generate_psf(
-        shape=(60, 128, 128), voxel_size=(0.25, 0.1, 0.1), attenuation_factor=30
-    )
-    save_tiff(psf1, "psf1.tif")
-    save_tiff(psf2, "psf2.tif")
-    pos1 = (28, 100, 80)
-    pos2 = (30, 100, 100)
-    img_sum = np.ones((60, 256, 256), dtype=np.uint16)
-    img_sum = add_psf(img_sum, psf1, pos1)
-    img_sum = add_psf(img_sum, psf2, pos2)
-    save_tiff(img_sum, "img_sum.tif")
+    # psf1 = generate_psf(
+    #     shape=(60, 128, 128), voxel_size=(0.25, 0.1, 0.1), attenuation_factor=20
+    # )
+    # psf2 = generate_psf(
+    #     shape=(60, 128, 128), voxel_size=(0.25, 0.1, 0.1), attenuation_factor=30
+    # )
+    # save_tiff(psf1, "psf1.tif")
+    # save_tiff(psf2, "psf2.tif")
+    # pos1 = (28, 100, 80)
+    # pos2 = (30, 100, 100)
+    # img_sum = np.ones((60, 256, 256), dtype=np.uint16)
+    # img_sum = add_psf(img_sum, psf1, pos1)
+    # img_sum = add_psf(img_sum, psf2, pos2)
+    # save_tiff(img_sum, "img_sum.tif")
+    n_spots = 100
+    psf_list = [
+        generate_psf(
+            shape=(60, 128, 128),
+            voxel_size=(0.25, 0.1, 0.1),
+            attenuation_factor=random.randint(30, 70),
+        )
+        for _ in range(n_spots)
+    ]
+    psf_pos_list = [
+        (
+            random.randint(5, 55),
+            random.randint(64, 256 - 64),
+            random.randint(64, 256 - 64),
+        )
+        for _ in range(n_spots)
+    ]
+    pos_shifted = []
+    for x, y, z in psf_pos_list:
+        pos_shifted.append(
+            (
+                x + random.randint(-4, 4),
+                y + random.randint(-4, 4),
+                z + random.randint(-4, 4),
+            )
+        )
+    img_ref = np.ones((60, 256, 256), dtype=np.uint16) * 10
+    target = np.ones((60, 256, 256), dtype=np.uint16) * 10
+    for i in range(n_spots):
+        img_ref = add_psf(img_ref, psf_list[i], psf_pos_list[i])
+        target = add_psf(target, psf_list[i], pos_shifted[i])
+
+    save_tiff(img_ref, "img_ref.tif")
+    save_tiff(target, "target.tif")

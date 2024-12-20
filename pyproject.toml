@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "registest"
-version = "0.1.1"
+version = "0.1.2"
 description = "Registration testing Tool"
 readme = "README.md"
 authors = [{ name = "Xavier DEVOS", email = "xavier.devos@cbs.cnrs.fr" }]
@@ -18,3 +18,9 @@ Homepage = "https://github.com/XDevos/registest"
 
 [project.scripts]
 registest = "registest.run_registest:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"registest.config" = ["*.json"]

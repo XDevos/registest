@@ -1,6 +1,5 @@
 import os
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tifffile
@@ -42,7 +41,7 @@ def calculate_normalized_mse(image1, image2):
     return mse
 
 
-def generate_similarity_report(reference_path, registered_dir, output_csv):
+def generate_similarity_report(reference_3d, registered_dir, output_csv):
     """
     Generate a similarity report comparing registered images to a reference image.
 
@@ -55,14 +54,12 @@ def generate_similarity_report(reference_path, registered_dir, output_csv):
     output_csv : str
         Path to save the generated CSV report.
     """
-    # Load reference image
-    reference = tifffile.imread(reference_path)
 
-    if reference.ndim != 3:
+    if reference_3d.ndim != 3:
         raise ValueError("The reference image must be 3D.")
 
     # Normalize the reference image
-    reference = normalize_image(reference)
+    reference_3d = normalize_image(reference_3d)
 
     report_data = []
 
@@ -81,7 +78,7 @@ def generate_similarity_report(reference_path, registered_dir, output_csv):
             target_path = os.path.join(method_path, target_name)
             target = tifffile.imread(target_path)
 
-            if target.shape != reference.shape:
+            if target.shape != reference_3d.shape:
                 raise ValueError(
                     f"Shape mismatch: {target_name} does not match the reference image."
                 )
@@ -90,16 +87,16 @@ def generate_similarity_report(reference_path, registered_dir, output_csv):
             target = normalize_image(target)
 
             # Calculate Normalized MSE and SSIM
-            mse_value = calculate_normalized_mse(reference, target)
-            ssim_value = ssim(reference, target, data_range=1.0)
+            mse_value = calculate_normalized_mse(reference_3d, target)
+            ssim_value = ssim(reference_3d, target, data_range=1.0)
 
             # Append results
             report_data.append(
                 {
                     "Method": method_name,
                     "Target": target_name,
-                    "Normalized MSE": mse_value,
-                    "SSIM": ssim_value,
+                    "Normalized MSE": round(mse_value, 6),
+                    "SSIM": round(ssim_value, 6),
                 }
             )
 
@@ -108,35 +105,6 @@ def generate_similarity_report(reference_path, registered_dir, output_csv):
     report_df.to_csv(output_csv, index=False)
 
     print(f"Similarity report saved to {output_csv}")
-
-    # Plot histogram
-    plot_mse_ssim_histogram(report_df)
-
-
-def plot_mse_ssim_histogram(report_df):
-    """
-    Plot histograms of Normalized MSE and SSIM values by method.
-
-    Parameters
-    ----------
-    report_df : pd.DataFrame
-        The DataFrame containing similarity metrics.
-    """
-    methods = report_df["Method"].unique()
-
-    plt.figure(figsize=(12, 6))
-
-    for method in methods:
-        subset = report_df[report_df["Method"] == method]
-        plt.hist(subset["Normalized MSE"], bins=20, alpha=0.5, label=f"{method} - MSE")
-        plt.hist(subset["SSIM"], bins=20, alpha=0.5, label=f"{method} - SSIM")
-
-    plt.xlabel("Metric Value")
-    plt.ylabel("Frequency")
-    plt.title("Histograms of Normalized MSE and SSIM by Method")
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
 
 
 if __name__ == "__main__":
