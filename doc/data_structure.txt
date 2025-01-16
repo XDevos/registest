@@ -1,0 +1,27 @@
+INPUT/
+├── reference.tif
+├── parameters.json
+├── reference/
+│   └── reference.tif (symbolic link)
+├── to_register/
+│   ├── target_0.tif
+│   ├── ...
+│   ├── target_n.tif
+│   └── metadata.json
+├── shifted/
+│   ├── target_0_shi.tif
+│   ├── ...
+│   ├── target_n_shifted.tif
+│   └── metadata.json
+├── similarity/
+│   ├── target_0_shi_ref.html
+│   ├── target_0_shi_ref.tif
+│   ├── target_0_shi_ref_pro.png
+│   ├── ...
+│   ├── target_n_shi_ref.html
+│   ├── target_n_shi_ref.tif
+│   ├── target_n_shi_ref_pro.png
+│   ├── report.pdf
+│   ├── graphs.png
+│   ├── similarity.csv
+│   └── metadata.json
