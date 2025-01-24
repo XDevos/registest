@@ -1,7 +1,7 @@
 ## Usage n°1: Transformation
 
 ```bash
-regis_transform -I path/to/img.tif -X 1.2 -Y 53 -Z 0.1 -O path/to/out/img.tif
+regis_transform -R path/to/img.tif -T path/to/out/img.tif -X 1.2 -Y 53 -Z 0.1
 ```
 
 ```bash
