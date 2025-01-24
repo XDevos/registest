@@ -35,8 +35,8 @@ Simple:
     "transform": [
         {"xyz": [1.2,53,0.1]}
     ],
-    "register": {},
-    "compare": {}
+    "register": [],
+    "compare": []
 }
 ```
 
@@ -61,5 +61,47 @@ Simple:
         {"method": "scipy"}
     ],
     "compare": {}
+}
+```
+
+
+
+## Usage n°3: Comparison
+
+```bash
+regis_compare -R path/to/ref.tif -T path/to/target.tif -F out/folder/
+```
+
+```bash
+registest -C compare --folder path/to/folder/with/data/
+```
+
+Simple:
+
+```json
+{
+    "transform": [],
+    "register": [],
+    "compare": [
+        {}
+    ]
+}
+```
+
+## Usage n°4: Registration + Comparison
+
+```bash
+registest -C register,compare --folder path/to/folder/with/data/
+```
+
+Simple:
+
+```json
+{
+    "transform": [],
+    "register": [
+        {"method": "scipy"}
+    ],
+    "compare": []
 }
 ```
