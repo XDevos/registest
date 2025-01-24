@@ -1,0 +1,21 @@
+{
+    "<relative/filepath.tif>": {
+        "reference_img": "<absolute/file/path/ref.tif>",
+        "transformation": {
+            "done": false,
+            "shift_values": null
+        },
+        "registration": {
+            "done": false,
+            "method": null
+        },
+        "shift": {
+            "done": false,
+            "values": null
+        },
+        "similarity": {
+            "SSIM": null,
+            "NMSE": null
+        }
+    }
+}
