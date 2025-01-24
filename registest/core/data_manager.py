@@ -102,6 +102,25 @@ class OutFolder:
             raise ValueError(f"The folder name '{name}' doesn't exist.")
 
 
+class OutImg:
+    def __init__(self, path: str):
+        self.path = path
+        self.make_parent_folders()
+
+    def make_parent_folders(self):
+        """
+        Create the necessary folders if they do not already exist.
+        """
+        try:
+            os.makedirs(os.path.dirname(self.path), exist_ok=True)
+        except Exception as e:
+            # for the case of permission issues
+            raise RuntimeError(f"Error creating folders: {e}")
+
+    def save(self, data):
+        save_tiff(data, self.path)
+
+
 class DataManager:
     def __init__(self, reference_path: str, output_path: str):
         self.ref = ReferenceImg(reference_path)

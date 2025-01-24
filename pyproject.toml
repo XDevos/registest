@@ -18,6 +18,7 @@ Homepage = "https://github.com/XDevos/registest"
 
 [project.scripts]
 registest = "registest.run_registest:main"
+regis_transform = "registest.modules.transformation:main"
 
 [tool.setuptools]
 include-package-data = true
