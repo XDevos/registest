@@ -32,4 +32,4 @@ jobs:
           pip install -e .
 
       - name: Run tests with pytest
-        run: pytest -vv
+        run: pytest test --ignore=test/DEPRECATED -vv
