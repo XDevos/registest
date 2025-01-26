@@ -3,6 +3,7 @@
 import os
 from typing import List
 
+from registest.config.metadata import MetadataManager
 from registest.utils.io_utils import load_tiff, save_tiff
 
 
@@ -17,6 +18,7 @@ class ReferenceImg:
             Path to the reference image file.
         """
         self.path = filepath
+        self.basename = os.path.basename(self.path).split(".")[0]
         self.data = self.load()
 
     def load(self):
@@ -109,14 +111,17 @@ class OutFolder:
 class OutImg:
     def __init__(self, path: str):
         self.path = path
+        self.dirname = os.path.dirname(self.path)
         self.make_parent_folders()
 
     def make_parent_folders(self):
         """
         Create the necessary folders if they do not already exist.
         """
+        if not self.dirname:  # dirname == ""
+            self.dirname = os.getcwd()
         try:
-            os.makedirs(os.path.dirname(self.path), exist_ok=True)
+            os.makedirs(self.dirname, exist_ok=True)
         except Exception as e:
             # for the case of permission issues
             raise RuntimeError(f"Error creating folders: {e}")
@@ -147,6 +152,11 @@ class DataManager:
         for name in fold_names:
             dir_path = os.path.join(root, name)
             os.makedirs(dir_path, exist_ok=True)
+
+    def save_metadata(self, metadata, folder):
+        folder_path = self.out_folder.find_path(folder)
+        meta_datam = MetadataManager(folder=folder_path)
+        meta_datam.add_file_metadata(metadata)
 
 
 def get_tif_filepaths(folder_path):

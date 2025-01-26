@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-from tqdm import tqdm, trange
+from tqdm import tqdm
 
 from registest.config.parameters import Parameters
 from registest.core.data_manager import DataManager, get_tif_filepaths
@@ -19,7 +19,7 @@ class Pipeline:
         self.params = params
         self.ref = self.datam.ref.data
         self.target_nbr = self.get_target_nbr()
-        self.default_cmds = ["prepare", "register", "compare"]
+        self.default_cmds = ["transform", "register", "compare"]
         self.commands = self.decode_cmd_list(raw_cmd_list)
 
     def decode_cmd_list(self, raw_cmd_list: str):
@@ -36,13 +36,13 @@ class Pipeline:
         return sorted_cmds
 
     def get_target_nbr(self):
-        return len(self.params.prepare["shifts"])
+        return len(self.params.transform)
 
     def run(self):
         print(f"Reference image: {self.datam.ref.path}")
-        if "prepare" in self.commands:
-            print("[Preparation]")
-            self.prepare()
+        if "transform" in self.commands:
+            print("[Transformation]")
+            self.transform()
         if "register" in self.commands:
             print("[Registration]")
             self.register()
@@ -50,21 +50,23 @@ class Pipeline:
             print("[Comparison]")
             self.compare()
 
-    def prepare(self):
-        transform_mod = Transform(self.params.prepare)
-        for i in trange(self.target_nbr):
-            transformed_img = transform_mod.execute(self.ref, i)
+    def transform(self):
+        for param in tqdm(self.params.transform):
+            xyz = param["xyz"]
+            transform_mod = Transform(xyz_shifts=xyz)
+            transformed_img = transform_mod.execute(self.ref)
+            target_name = f"{self.datam.ref.basename}_{xyz[0]}_{xyz[1]}_{xyz[2]}"
             self.datam.save_tif(
-                data=transformed_img, folder="Preparation", name=f"target_{i}"
+                data=transformed_img, folder="to_register", name=target_name
             )
-        transform_mod.save_shifts_used(self.datam.out_folder.prepa)
+            metadata = transform_mod.generate_metadata(target_name, self.datam.ref.path)
+            self.datam.save_metadata(metadata, "to_register")
 
     def register(self):
         shifts_found = {}
         target_paths = get_tif_filepaths(self.datam.out_folder.prepa)
         for targ_path in tqdm(target_paths):
             for reg_method in self.params.register["method"]:
-
                 target = load_tiff(targ_path)
                 shift_3d = list(phase_cross_correlation_wrapper(self.ref, target))
                 basename = os.path.basename(targ_path)
@@ -75,7 +77,6 @@ class Pipeline:
                     folder="Registration",
                     name=os.path.join(reg_method, f"shifted_{basename}"),
                 )
-
         path = os.path.join(self.datam.out_folder.regis, "shifts_found.json")
         save_json(shifts_found, path)
 

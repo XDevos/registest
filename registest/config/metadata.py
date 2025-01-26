@@ -1,5 +1,6 @@
-import json
 import os
+
+from registest.utils.io_utils import load_json, save_json
 
 
 class FileMetadata:
@@ -31,15 +32,13 @@ class MetadataManager:
 
     def _load_metadata(self):
         """Load JSON file if exist, or return an empty dict."""
-        if os.path.exists(self.metadata_file):
-            with open(self.metadata_file, "r", encoding="utf-8") as f:
-                return json.load(f)
+        if os.path.exists(self.filepath):
+            return load_json(self.filepath)
         return {}
 
     def save_metadata(self):
         """Save current metadata"""
-        with open(self.metadata_file, "w", encoding="utf-8") as f:
-            json.dump(self.data, f, indent=4)
+        save_json(self.data, self.filepath)
 
     def add_file_metadata(self, file_metadata: FileMetadata):
         """Add metadata for a new file"""

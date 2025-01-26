@@ -21,6 +21,12 @@ def parse_run_args():
         help="Reference 3D image filepath.",
     )
     parser.add_argument(
+        "-T",
+        "--target",
+        type=str,
+        help="Target 3D image filepath.",
+    )
+    parser.add_argument(
         "-F",
         "--folder",
         type=str,

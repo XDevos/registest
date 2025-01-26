@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import os
-from datetime import datetime
 from typing import Any, List
 
 import numpy as np
 from scipy.ndimage import shift
 
-from registest._version import __version__
+from registest.config.metadata import FileMetadata, MetadataManager
 from registest.core.data_manager import OutImg, ReferenceImg
 from registest.core.run_args import parse_run_args
 from registest.utils.io_utils import save_json
+from registest.utils.metrics import timing_main
 
 
 def shift_3d_array_subpixel(array_3d, shift_values, filling_val=0.0):
@@ -57,9 +57,8 @@ class Transform:
 
     def execute(self, img):
         if self.method == "scipy":
-            return shift_3d_array_subpixel(
-                img, self.xyz_shifts, filling_val=self.filling_value
-            )
+            zxy = [self.xyz_shifts[2], self.xyz_shifts[0], self.xyz_shifts[1]]
+            return shift_3d_array_subpixel(img, zxy, filling_val=self.filling_value)
         else:
             raise NotImplementedError(
                 f"The method '{self.method}' is not implemented. Please use a supported method such as 'scipy'."
@@ -70,28 +69,24 @@ class Transform:
         path = os.path.join(prepa_path, "image_names_with_shifts.json")
         save_json(out, path)
 
-    def generate_metadata(key_path: str, ref_path):
-        # TODO
-        pass
+    def generate_metadata(self, key_path: str, ref_path):
+        metad = FileMetadata(key_path, ref_path)
+        metad.transformation = {"done": True, "xyz_values": self.xyz_shifts}
+        return metad
 
 
-def _main():
+@timing_main
+def main():
     run_args = parse_run_args()
     ref_img = ReferenceImg(run_args.reference)
     out_img = OutImg(run_args.target)
-    xyz_shifts = [run_args.x, run_args.y, run_args.z]
+    xyz_shifts = [run_args.X, run_args.Y, run_args.Z]
     transformation = Transform(xyz_shifts=xyz_shifts)
     transformed_img = transformation.execute(ref_img.data)
     out_img.save(transformed_img)
-    transformation.generate_metadata(out_img.path, ref_path=ref_img.path)
-
-
-def main():
-    begin_time = datetime.now()
-    print(f"[VERSION] RegisTest {__version__}")
-    _main()
-    print("\n==================== Normal termination ====================\n")
-    print(f"Elapsed time: {datetime.now() - begin_time}")
+    metad = transformation.generate_metadata(out_img.path, ref_path=ref_img.path)
+    meta_datam = MetadataManager(folder=out_img.dirname)
+    meta_datam.add_file_metadata(metad)
 
 
 if __name__ == "__main__":

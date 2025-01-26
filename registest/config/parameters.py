@@ -9,7 +9,7 @@ class Parameters:
     def __init__(self, path: str):
         self.path = path
         self.dict = self.load_parameters()
-        self.prepare = self.dict["prepare"]
+        self.transform = self.dict["transform"]
         self.register = self.dict["register"]
 
     def load_parameters(self):
