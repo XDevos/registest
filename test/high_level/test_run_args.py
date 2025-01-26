@@ -85,6 +85,21 @@ def test_parse_run_args_with_default_parameters(monkeypatch):
 )
 def test_parse_run_args_reference(cli_args, expected_reference):
     """Test parsing of -R/--reference command-line argument."""
-    with patch.object(sys, "argv", ["script_name.py"] + cli_args):
+    with patch.object(sys, "argv", ["registest"] + cli_args):
         args = parse_run_args()
         assert args.reference == expected_reference
+
+
+@pytest.mark.parametrize(
+    "cli_args, expected_folder",
+    [
+        (["-F", "path/to/data"], "path/to/data"),
+        (["--folder", "path/to/data/"], "path/to/data/"),
+        ([], os.getcwd()),  # No argument should result current directory
+    ],
+)
+def test_parse_run_args_folder(cli_args, expected_folder):
+    """Test parsing of -F/--folder command-line argument."""
+    with patch.object(sys, "argv", ["registest"] + cli_args):
+        args = parse_run_args()
+        assert args.folder == expected_folder

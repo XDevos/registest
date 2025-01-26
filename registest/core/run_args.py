@@ -31,8 +31,8 @@ def parse_run_args():
         "-C",
         "--command",
         type=str,
-        default="prepare,register,compare",
-        help="Comma-separated command list.\nDEFAULT: prepare,register,compare",
+        default="transform,register,compare",
+        help="Comma-separated command list.\nDEFAULT: transform,register,compare",
     )
     parser.add_argument(
         "-P",
