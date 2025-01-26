@@ -12,7 +12,7 @@ from registest.utils.metrics import timing_main
 @timing_main
 def main():
     run_args = parse_run_args()
-    datam = DataManager(run_args.reference, run_args.output)
+    datam = DataManager(run_args.reference, run_args.folder)
     params = Parameters(run_args.parameters)
     pipe = Pipeline(datam, params, run_args.command)
     pipe.run()

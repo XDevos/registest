@@ -71,9 +71,10 @@ class OutFolder:
             Path to the main output folder.
         """
         self.path = path
-        self.prepa = os.path.join(self.path, "Preparation")
-        self.regis = os.path.join(self.path, "Registration")
-        self.comp = os.path.join(self.path, "Comparison")
+        self.reference = os.path.join(self.path, "reference")
+        self.to_register = os.path.join(self.path, "to_register")
+        self.shifted = os.path.join(self.path, "shifted")
+        self.similarity = os.path.join(self.path, "similarity")
         self.create_folders()
 
     def create_folders(self):
@@ -84,20 +85,23 @@ class OutFolder:
             # Create the main output folder
             os.makedirs(self.path, exist_ok=True)
             # Create the subfolders
-            os.makedirs(self.prepa, exist_ok=True)
-            os.makedirs(self.regis, exist_ok=True)
-            os.makedirs(self.comp, exist_ok=True)
+            os.makedirs(self.reference, exist_ok=True)
+            os.makedirs(self.to_register, exist_ok=True)
+            os.makedirs(self.shifted, exist_ok=True)
+            os.makedirs(self.similarity, exist_ok=True)
         except Exception as e:
             # for the case of permission issues
             raise RuntimeError(f"Error creating folders: {e}")
 
     def find_path(self, name: str):
-        if name == os.path.basename(self.prepa):
-            return self.prepa
-        elif name == os.path.basename(self.regis):
-            return self.regis
-        elif name == os.path.basename(self.comp):
-            return self.comp
+        if name == os.path.basename(self.reference):
+            return self.reference
+        elif name == os.path.basename(self.to_register):
+            return self.to_register
+        elif name == os.path.basename(self.shifted):
+            return self.shifted
+        elif name == os.path.basename(self.similarity):
+            return self.similarity
         else:
             raise ValueError(f"The folder name '{name}' doesn't exist.")
 
