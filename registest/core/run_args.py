@@ -60,4 +60,12 @@ def parse_run_args():
         help="Transformation value for the Z-axis",
     )
 
+    parser.add_argument(
+        "-M",
+        "--method",
+        type=str,
+        default="scipy",
+        help="Registration method name. Default: scipy",
+    )
+
     return parser.parse_args()

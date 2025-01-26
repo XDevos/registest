@@ -129,3 +129,38 @@ def test_parse_run_args_xyz(cli_args, expected_x, expected_y, expected_z):
         assert args.X == expected_x
         assert args.Y == expected_y
         assert args.Z == expected_z
+
+
+# method arg
+@pytest.mark.parametrize(
+    "cli_args, expected_method",
+    [
+        (["-M", "register_global"], "register_global"),
+        (["--method", "register_local"], "register_local"),
+        ([], "scipy"),  # No argument should result "scipy" method name
+    ],
+)
+def test_parse_run_args_method(cli_args, expected_method):
+    """Test parsing of -M/--method command-line argument."""
+    with patch.object(sys, "argv", ["registest"] + cli_args):
+        args = parse_run_args()
+        assert args.method == expected_method
+
+
+# command arg
+@pytest.mark.parametrize(
+    "cli_args, expected_method",
+    [
+        (["-C", "transform"], "transform"),
+        (["--command", "register,compare"], "register,compare"),
+        (
+            [],
+            "transform,register,compare",
+        ),  # No argument should result default "transform,register,compare"
+    ],
+)
+def test_parse_run_args_command(cli_args, expected_method):
+    """Test parsing of -C/--command command-line argument."""
+    with patch.object(sys, "argv", ["registest"] + cli_args):
+        args = parse_run_args()
+        assert args.command == expected_method
