@@ -20,6 +20,7 @@ Homepage = "https://github.com/XDevos/registest"
 registest = "registest.run_registest:main"
 regis_transform = "registest.modules.transformation:main"
 regis_register = "registest.modules.registration:main"
+regis_compare = "registest.modules.comparison:main"
 
 [tool.setuptools]
 include-package-data = true

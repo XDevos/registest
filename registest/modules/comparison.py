@@ -1,6 +1,9 @@
 import numpy as np
 from skimage.metrics import mean_squared_error, structural_similarity
 
+from registest.core.run_args import parse_run_args
+from registest.utils.metrics import timing_main
+
 
 class Compare:
     @staticmethod
@@ -22,3 +25,12 @@ def masked_ssim(ref, target, neutral_val=0):
     target_valid = np.nan_to_num(target, nan=neutral_val)
     ssim_value = structural_similarity(ref_valid, target_valid)
     return ssim_value
+
+
+@timing_main
+def main():
+    _ = parse_run_args()
+
+
+if __name__ == "__main__":
+    main()
