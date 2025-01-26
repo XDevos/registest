@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import os
-from typing import List
 
 from registest.config.metadata import MetadataManager
-from registest.utils.io_utils import load_tiff, save_tiff
+from registest.utils.io_utils import load_json, load_tiff, save_tiff
 
 
 class ReferenceImg:
@@ -17,7 +16,7 @@ class ReferenceImg:
         filepath : str
             Path to the reference image file.
         """
-        self.path = filepath
+        self.path = os.path.abspath(filepath)
         self.basename = os.path.basename(self.path).split(".")[0]
         self.data = self.load()
 
@@ -131,9 +130,29 @@ class OutImg:
 
 
 class DataManager:
-    def __init__(self, reference_path: str, output_path: str):
-        self.ref = ReferenceImg(reference_path)
+    def __init__(self, output_path: str):
         self.out_folder = OutFolder(output_path)
+        self.ref_list = [ReferenceImg(path) for path in self.find_refs()]
+        self.create_ref_symlink()
+
+    def find_refs(self):
+        paths = get_tif_filepaths(self.out_folder.reference)
+        if not paths:
+            paths = get_tif_filepaths(self.out_folder.path)
+        return paths
+
+    def create_ref_symlink(self):
+        """
+        Creates a symbolic link of reference TIFF images inside `reference` folder.
+        """
+        folder_path = self.out_folder.reference
+        for ref in self.ref_list:
+            symlink_path = os.path.join(folder_path, os.path.basename(ref.path))
+            if os.path.exists(symlink_path):
+                print(f"Symbolic link already exists: {symlink_path}")
+            else:
+                os.symlink(os.path.abspath(ref.path), symlink_path)
+                print(f"Symbolic link created: {symlink_path}")
 
     def save_tif(self, data, folder, name):
         folder_path = self.out_folder.find_path(folder)
@@ -142,16 +161,6 @@ class DataManager:
         filepath = os.path.join(folder_path, name)
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         save_tiff(data, filepath)
-
-    def get_prepa_img_paths(self):
-        folder_to_explore = self.out_folder.prepa
-        paths = get_tif_filepaths(folder_to_explore)
-        return paths
-
-    def make_method_folders(self, root: str, fold_names: List[str]):
-        for name in fold_names:
-            dir_path = os.path.join(root, name)
-            os.makedirs(dir_path, exist_ok=True)
 
     def save_metadata(self, metadata, folder):
         folder_path = self.out_folder.find_path(folder)
@@ -186,3 +195,18 @@ def get_tif_filepaths(folder_path):
     ]
 
     return tif_paths
+
+
+def remove_ext(name):
+    return ".".join(name.split(".")[:-1])
+
+
+def get_target_paths(folder, ref_path):
+    if "metadata.json" not in os.listdir(folder):
+        return get_tif_filepaths(folder)
+    target_paths = []
+    metad = load_json(os.path.join(folder, "metadata.json"))
+    for key, val in metad.items():
+        if os.path.basename(val["reference_img"]) == os.path.basename(ref_path):
+            target_paths.append(os.path.join(folder, key))
+    return target_paths
