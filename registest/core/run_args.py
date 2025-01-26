@@ -21,11 +21,11 @@ def parse_run_args():
         help="Reference 3D image filepath.",
     )
     parser.add_argument(
-        "-O",
-        "--output",
+        "-F",
+        "--folder",
         type=str,
         default=os.getcwd(),
-        help="Folder path for output data.\nDEFAULT: Current directory",
+        help="Folder path for data.\nDEFAULT: Current directory",
     )
     parser.add_argument(
         "-C",
