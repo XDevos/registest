@@ -42,4 +42,22 @@ def parse_run_args():
         help="Path of the parameters.json file.\nDEFAULT: We expect this file inside your current directory",
     )
 
+    parser.add_argument(
+        "-X",
+        type=float,
+        help="Transformation value for the X-axis",
+    )
+
+    parser.add_argument(
+        "-Y",
+        type=float,
+        help="Transformation value for the Y-axis",
+    )
+
+    parser.add_argument(
+        "-Z",
+        type=float,
+        help="Transformation value for the Z-axis",
+    )
+
     return parser.parse_args()
