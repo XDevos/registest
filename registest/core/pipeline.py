@@ -21,6 +21,16 @@ class Pipeline:
         self.ref = self.datam.ref_list[0]
         self.default_cmds = ["transform", "register", "compare"]
         self.commands = self.decode_cmd_list(raw_cmd_list)
+        self.out_transform = "to_register"
+        self.update_folder()
+
+    def update_folder(self):
+        if self.commands == ["transform", "compare"]:
+            self.datam.out_folder.to_register = self.datam.out_folder.shifted
+            print(
+                "Output folder of `transform` change from `to_register` to `shifted` to be compatible with `compare`."
+            )
+            self.out_transform = "shifted"
 
     def decode_cmd_list(self, raw_cmd_list: str):
         commands = raw_cmd_list.split(",")
@@ -63,10 +73,10 @@ class Pipeline:
             transformed_img = transform_mod.execute(self.ref.data)
             target_name = f"{self.ref.basename}_{xyz[0]}_{xyz[1]}_{xyz[2]}.tif"
             self.datam.save_tif(
-                data=transformed_img, folder="to_register", name=target_name
+                data=transformed_img, folder=self.out_transform, name=target_name
             )
             metadata = transform_mod.generate_metadata(target_name, self.ref.path)
-            self.datam.save_metadata(metadata, "to_register")
+            self.datam.save_metadata(metadata, self.out_transform)
 
     def register(self):
         target_paths = get_target_paths(
