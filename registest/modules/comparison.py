@@ -102,7 +102,7 @@ def add_page_pdf(
 
     # Calculate position (centered)
     x_pos = (595 - (img_width * scale)) / 2
-    y_pos = 500  # Place it near the top
+    y_pos = 50  # Place image **at the top of the page**
 
     # Insert the image
     new_page.insert_image(
@@ -110,13 +110,14 @@ def add_page_pdf(
         filename=img_2d_path,
     )
 
-    # Insert text information below the image
-    y_text = y_pos - 50  # Start above image
+    # Adjust text position **below the image**
+    text_start_y = y_pos + (img_height * scale) + 20  # 20 pts below the image
     x_text = 50  # Left margin
 
+    # Insert text information
     for key, value in info_dict.items():
-        new_page.insert_text((x_text, y_text), f"{key}: {value}", fontsize=12)
-        y_text -= 20  # Move down for the next line
+        new_page.insert_text((x_text, text_start_y), f"{key}: {value}", fontsize=12)
+        text_start_y += 20  # Move down for the next line
 
     temp_pdf = "temp_updated.pdf"  # Temporary file
     # Save the modified PDF
