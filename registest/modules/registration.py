@@ -2,6 +2,7 @@
 
 import os
 
+import SimpleITK as sitk
 from skimage.registration import phase_cross_correlation
 
 from registest.config.metadata import FileMetadata, MetadataManager
@@ -14,6 +15,31 @@ from registest.utils.metrics import timing_main
 def phase_cross_correlation_wrapper(ref_3d, target_3d):
     shift, _, _ = phase_cross_correlation(ref_3d, target_3d, upsample_factor=100)
     return shift
+
+
+def affine_sitk(fixed_image, moving_image):
+    # Convert NumPy arrays to SimpleITK images and cast to Float32
+    fixed_sitk = sitk.GetImageFromArray(fixed_image)
+    moving_sitk = sitk.GetImageFromArray(moving_image)
+    fixed_sitk = sitk.Cast(fixed_sitk, sitk.sitkFloat32)  # Convert to float
+    moving_sitk = sitk.Cast(moving_sitk, sitk.sitkFloat32)  # Convert to float
+    registration = sitk.ImageRegistrationMethod()
+    registration.SetMetricAsMeanSquares()
+    # Optimization
+    registration.SetOptimizerAsRegularStepGradientDescent(
+        learningRate=1.0, minStep=1e-4, numberOfIterations=100
+    )
+    transform = sitk.CenteredTransformInitializer(
+        fixed_sitk,
+        moving_sitk,
+        sitk.AffineTransform(3),
+        sitk.CenteredTransformInitializerFilter.GEOMETRY,
+    )
+    registration.SetInitialTransform(transform, inPlace=False)
+    final_transform = registration.Execute(fixed_sitk, moving_sitk)
+    affine_transform = final_transform.GetBackTransform()  # Extracts the last transform
+    shift_x, shift_y, shift_z = affine_transform.GetTranslation()
+    return [shift_x, shift_y, shift_z]
 
 
 class Register:
@@ -33,9 +59,17 @@ class Register:
                 float(self.zxy_shift[0]),
             ]
             return self.apply(target_3d)
+        elif self.method == "global_sitk":
+            self.xyz_shift = affine_sitk(ref_3d, target_3d)
+            self.zxy_shift = [
+                float(self.xyz_shift[2]),
+                float(self.xyz_shift[0]),
+                float(self.xyz_shift[1]),
+            ]
+            return self.apply(target_3d)
         else:
             raise NotImplementedError(
-                f"The method '{self.method}' is not implemented. Please use a supported method such as 'global_pyhim'."
+                f"The method '{self.method}' is not implemented. Please use a supported method such as 'global_pyhim' or `global_sitk`."
             )
 
     def apply(self, target_3d):

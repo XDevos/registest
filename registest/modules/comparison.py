@@ -1,7 +1,10 @@
 import os
+import shutil
 
+import fitz  # PyMuPDF
 import numpy as np
 import pandas as pd
+from PIL import Image
 from skimage.metrics import structural_similarity as ssim
 
 from registest.core.data_manager import ReferenceImg
@@ -62,6 +65,67 @@ class Compare:
         }
 
 
+def add_page_pdf(
+    img_2d_path, pdf_path, refpath, target_path, xyz_transfo, xyz_shifts, ssim, nmse
+):
+
+    # Sample dictionary with information
+    info_dict = {
+        "Reference Path": refpath,
+        "Target Path": target_path,
+        # "XYZ Transformation": xyz_transfo,
+        # "XYZ Shifts": xyz_shifts,
+        "SSIM": ssim,
+        "NMSE": nmse,
+    }
+
+    # Ensure the image exists
+    if not os.path.exists(img_2d_path):
+        raise FileNotFoundError(f"Image not found: {img_2d_path}")
+
+    # Check if the PDF exists
+    if os.path.exists(pdf_path):
+        doc = fitz.open(pdf_path)  # Open existing PDF
+        print(f"Appending a new page to {pdf_path}")
+    else:
+        doc = fitz.open()  # Create a new empty PDF
+        print(f"Creating a new PDF as {pdf_path}")
+
+    # Create a new page (A4 size)
+    new_page = doc.new_page(width=595, height=842)  # Standard A4 page in points
+
+    # Add an image
+    img = Image.open(img_2d_path)
+    img_width, img_height = img.size
+    max_width, max_height = 400, 300  # Max size in points
+    scale = min(max_width / img_width, max_height / img_height)
+
+    # Calculate position (centered)
+    x_pos = (595 - (img_width * scale)) / 2
+    y_pos = 500  # Place it near the top
+
+    # Insert the image
+    new_page.insert_image(
+        (x_pos, y_pos, x_pos + img_width * scale, y_pos + img_height * scale),
+        filename=img_2d_path,
+    )
+
+    # Insert text information below the image
+    y_text = y_pos - 50  # Start above image
+    x_text = 50  # Left margin
+
+    for key, value in info_dict.items():
+        new_page.insert_text((x_text, y_text), f"{key}: {value}", fontsize=12)
+        y_text -= 20  # Move down for the next line
+
+    temp_pdf = "temp_updated.pdf"  # Temporary file
+    # Save the modified PDF
+    doc.save(temp_pdf)
+    doc.close()
+    # Replace the original file with the updated version
+    shutil.move(temp_pdf, pdf_path)
+
+
 @timing_main
 def main():
     run_args = parse_run_args()
@@ -77,7 +141,10 @@ def main():
     report["target"] = run_args.target
     # Save report to CSV
     report_df = pd.DataFrame([report])
-    report_df.to_csv(out_csv, index=False)
+    # Append the new row to the existing CSV file without erasing data
+    report_df.to_csv(
+        out_csv, mode="a", header=not pd.io.common.file_exists(out_csv), index=False
+    )
     print(f"Similarity report saved to {out_csv}")
     # Plotting
     visu_rgb_slice(

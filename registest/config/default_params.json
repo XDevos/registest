@@ -5,7 +5,8 @@
         {"xyz": [-25,-10,-3]}
     ],
     "register": [
-        {"method": "global_pyhim"}
+        {"method": "global_pyhim"},
+        {"method": "global_sitk"}
     ],
     "compare": []
 }

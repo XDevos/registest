@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from registest.config.parameters import Parameters
 from registest.core.data_manager import DataManager, get_target_paths, remove_ext
-from registest.modules.comparison import Compare, normalize_image
+from registest.modules.comparison import Compare, add_page_pdf, normalize_image
 from registest.modules.registration import Register
 from registest.modules.transformation import Transform
 from registest.utils.io_utils import load_tiff, save_png
@@ -113,11 +113,16 @@ class Pipeline:
             target = normalize_image(target)
             comp_mod = Compare()
             report = comp_mod.execute(self.ref.data, target)
-            report["method"] = ""
+            report["method"] = "unknown"
             report["target"] = targ_path
             # Save report to CSV
             report_df = pd.DataFrame([report])
-            report_df.to_csv(output_csv, index=False)
+            report_df.to_csv(
+                output_csv,
+                mode="a",
+                header=not pd.io.common.file_exists(output_csv),
+                index=False,
+            )
             print(f"Similarity report saved to {output_csv}")
             # Plotting
             visu_rgb_slice(
@@ -126,9 +131,19 @@ class Pipeline:
                 path_to_save=os.path.join(out_folder, os.path.basename(targ_path)),
             )
             project = visu_rgb_2d(self.ref.data, target)
-            save_png(
-                project,
-                os.path.join(out_folder, f"{os.path.basename(targ_path)}_2d.png"),
+            img_2d_path = os.path.join(
+                out_folder, f"{os.path.basename(targ_path)}_2d.png"
+            )
+            save_png(project, img_2d_path)
+            add_page_pdf(
+                img_2d_path,
+                os.path.join(out_folder, "similarity_report.pdf"),
+                self.ref.path,
+                targ_path,
+                xyz_transfo=[0, 0, 0],
+                xyz_shifts=[0, 0, 0],
+                ssim=report["SSIM"],
+                nmse=report["NMSE"],
             )
 
         # generate_similarity_report(
