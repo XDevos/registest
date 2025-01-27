@@ -180,7 +180,7 @@ def visu_rgb_slice(ref_img, shifted_img, path_to_save):
         raise ValueError("Both images must have the same shape.")
 
     min_ch = np.minimum(ref_img, shifted_img)
-    rgb_slices = np.stack(
+    overlay = np.stack(
         [
             enhance_contrast(ref_img),
             enhance_contrast(shifted_img),
@@ -191,7 +191,7 @@ def visu_rgb_slice(ref_img, shifted_img, path_to_save):
 
     # Visualize using Plotly
     fig = px.imshow(
-        rgb_slices,
+        overlay,
         animation_frame=0,  # Frame corresponds to slices along Z-axis
         labels={"animation_frame": "Z Slice"},
     )
@@ -203,6 +203,42 @@ def visu_rgb_slice(ref_img, shifted_img, path_to_save):
     # Save visualization as HTML
     fig.write_html(path_to_save + ".html")
     print("Visualization saved to " + path_to_save + ".html")
+
+    return overlay
+
+
+def visu_rgb_2d(ref_img, shifted_img):
+    """
+    Visualize two 2D images together using the RGB overlay technique.
+
+    Parameters
+    ----------
+    ref_img : ndarray
+        The reference image to be visualized in the red channel.
+    shifted_img : ndarray
+        The shifted image to be visualized in the green channel.
+    """
+    # Ensure both images have the same shape
+    if ref_img.shape != shifted_img.shape:
+        raise ValueError("Both images must have the same shape.")
+
+    min_ch = np.minimum(ref_img, shifted_img)
+    overlay = np.stack(
+        [
+            enhance_contrast(ref_img).max(axis=0),
+            enhance_contrast(shifted_img).max(axis=0),
+            enhance_contrast(min_ch).max(axis=0),
+        ],
+        axis=-1,
+    )
+    # Display the overlay
+    # plt.figure(figsize=(6, 6))
+    # plt.imshow(overlay)
+    # plt.axis("off")  # Hide axis for better visualization
+    # plt.title("RGB Overlay: Red (Reference), Green (Shifted), Blue (Overlap)")
+    # plt.show()
+
+    return (overlay * 255).astype(np.uint8)
 
 
 if __name__ == "__main__":
@@ -216,4 +252,4 @@ if __name__ == "__main__":
     normalized_3d = normalize_image(image_3d)
     tar_3d = tifffile.imread(tar0)
     normalized_tar = normalize_image(tar_3d)
-    visu_rgb_slice(normalized_3d, normalized_tar, "visualization_rgb_slices")
+    visu_rgb_slice(normalized_3d, normalized_tar, "visualization_overlay")
